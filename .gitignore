@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# project files
+*.iml
+*.ipr
+*.iws
+
+# system files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db

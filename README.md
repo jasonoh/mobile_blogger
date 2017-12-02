@@ -9,6 +9,13 @@ The config file let's you specify Gitlab and Dropbox deets.
 
 This is largely based on the [work](http://codenugget.co/2015/11/18/mobile-blogging-with-pythonista-jekyll-and-github.html) from Pascal Cremer, but updated for Gitlab (vs Github) and with the added integration with Dropbox.
 
+## Details
+My Jekyll instance resides on my own server, so I don't rely on the Github feature for hosting my blog. Git commits are
+so that I have versioning on my blog posts. The key for my setup is the headless Dropbox instance on my server; once I sync
+the relevant file to the appropriate location in Dropbox, it automatically syncs to the server and the post goes live.
+
+Your setup may be entirely different and this application may not suit your needs at all.
+
 Feel free to contribute comments/improvements!
 
 # License

@@ -133,7 +133,6 @@ excerpt:    "${excerpt}"
         latest_commit = self._get_latest_commit()
 
         print(text)
-        sys.exit(0)
 
         filepath_prefix = cfg.dropbox['drafts_dir_prefix'] if metas['draft'] else cfg.dropbox['posts_dir_prefix']
 

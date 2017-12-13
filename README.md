@@ -5,7 +5,7 @@
 ### Prerequisites
 * [Pythonista for iOS](http://omz-software.com/pythonista/)
 * [Gitlab](https://gitlab.com)
-  * generate a (personal access token)[https://gitlab.com/profile/personal_access_tokens]
+  * generate a [personal access token](https://gitlab.com/profile/personal_access_tokens)
   * obtain the project id for the associated repo
 * [Dropbox](https://dropbox.com)
   * create a Dropbox app for this integration

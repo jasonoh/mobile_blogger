@@ -52,10 +52,10 @@ def process_string_array(array):
 
 class MobileBlogger:
     def __init__(self, gitlab_url, gitlab_repo, gitlab_token, dbx_token):
-        self.gitlab_url = gitlab_url
-        self.gitlab_repo = gitlab_repo
+        self.gitlab_url   = gitlab_url
+        self.gitlab_repo  = gitlab_repo
         self.gitlab_token = gitlab_token
-        self.dbx_token = dbx_token
+        self.dbx_token    = dbx_token
         self._latest_commit = None
         self._initialize_clients()
 
@@ -86,7 +86,7 @@ author:     "${author}"
         draft = metas['draft']
         if draft:
             metas['draft'] = str(draft).lower()
-            template += '''draft:      ${draft}
+            template +='''draft:      ${draft}
 '''
 
         template += '''categories: ${categories}
@@ -132,8 +132,6 @@ excerpt:    "${excerpt}"
         text = self._prepend_metadata(text, default_metas)
         latest_commit = self._get_latest_commit()
 
-        print(text)
-
         filepath_prefix = cfg.dropbox['drafts_dir_prefix'] if metas['draft'] else cfg.dropbox['posts_dir_prefix']
 
         commit_data = {
@@ -144,7 +142,7 @@ excerpt:    "${excerpt}"
                     'action': 'create',
                     'file_path': filepath_prefix + filename,
                     'content': text
-                }
+                }  
             ]
         }
         commit = self.project.commits.create(commit_data)
@@ -170,12 +168,12 @@ Generic test data!'''
         text = appex.get_text()
 
     if text:
-        author = cfg.post['post_author']
-        gitlab_url = cfg.post['gitlab_url']
-        gitlab_user = cfg.post['gitlab_user']
-        gitlab_repo = cfg.post['gitlab_repo']
-        gitlab_token = keychain.get_password('gitlab_token', gitlab_user) or ''
-        dbx_token = keychain.get_password('dbx_token', gitlab_user) or ''
+        author         = cfg.post['post_author']
+        gitlab_url     = cfg.post['gitlab_url']
+        gitlab_user    = cfg.post['gitlab_user']
+        gitlab_repo    = cfg.post['gitlab_repo']
+        gitlab_token   = keychain.get_password('gitlab_token', gitlab_user) or ''
+        dbx_token      = keychain.get_password('dbx_token', gitlab_user) or ''
 
         (title, text) = extract_title(text)
         filename = '%s-%s.md' % (date.today(), slug(title))
@@ -183,22 +181,17 @@ Generic test data!'''
         dbx_fields = (
             'Dropbox Settings',
             [
-                dict(title='Dropbox Token', key='dbx_token', type='text', value=dbx_token, autocorrection=False,
-                     autocapitalization=False)
+                dict(title='Dropbox Token', key='dbx_token', type='text', value=dbx_token, autocorrection=False, autocapitalization=False)
             ]
         )
 
         gitlab_fields = (
             'Gitlab Settings',
             [
-                dict(title='Gitlab URL', key='gitlab_url', type='text', value=gitlab_url, autocorrection=False,
-                     autocapitalization=False),
-                dict(title='Gitlab User', key='gitlab_user', type='text', value=gitlab_user, autocorrection=False,
-                     autocapitalization=False),
-                dict(title='Gitlab Token', key='gitlab_token', type='text', value=gitlab_token, autocorrection=False,
-                     autocapitalization=False),
-                dict(title='Repo', key='gitlab_repo', type='text', value=gitlab_repo, autocorrection=False,
-                     autocapitalization=False)
+                dict(title='Gitlab URL', key='gitlab_url', type='text', value=gitlab_url, autocorrection=False, autocapitalization=False),
+                dict(title='Gitlab User', key='gitlab_user', type='text', value=gitlab_user, autocorrection=False, autocapitalization=False),
+                dict(title='Gitlab Token', key='gitlab_token', type='text', value=gitlab_token, autocorrection=False, autocapitalization=False),
+                dict(title='Repo', key='gitlab_repo', type='text', value=gitlab_repo, autocorrection=False, autocapitalization=False)
             ]
         )
 
@@ -208,8 +201,7 @@ Generic test data!'''
                 dict(title='Title', key='title', type='text', value=title),
                 dict(title='Author', key='author', type='text', value=author),
                 dict(title='Draft', key='draft', type='switch', value=True),
-                dict(title='Layout', key='layout', type='text', value='post', autocorrection=False,
-                     autocapitalization=False),
+                dict(title='Layout', key='layout', type='text', value='post', autocorrection=False, autocapitalization=False),
                 dict(title='Tags', key='tags', type='text', value=''),
                 dict(title='Categories', key='categories', type='text', value=''),
                 dict(title='Comments', key='comments', type='switch', value=True),
@@ -217,8 +209,7 @@ Generic test data!'''
                 dict(title='ImagePath', key='feature_img_path', type='text', value=''),
                 dict(title='ImageWide', key='feature_img_wide', type='switch', value=False),
                 dict(title='ImageCaption', key='feature_img_caption', type='text', value=''),
-                dict(title='Filename', key='filename', type='text', value=filename, autocorrection=False,
-                     autocapitalization=False)
+                dict(title='Filename', key='filename', type='text', value=filename, autocorrection=False, autocapitalization=False)
             ],
             'Separate tags/categories with spaces'
         )

@@ -86,7 +86,7 @@ author:     "${author}"
         draft = metas['draft']
         if draft:
             metas['draft'] = str(draft).lower()
-            template +='''draft:      ${draft}
+            template += '''draft:      ${draft}
 '''
 
         template += '''categories: ${categories}
@@ -132,7 +132,7 @@ excerpt:    "${excerpt}"
         text = self._prepend_metadata(text, default_metas)
         latest_commit = self._get_latest_commit()
 
-        filepath_prefix = cfg.dropbox['drafts_dir_prefix'] if metas['draft'] else cfg.dropbox['posts_dir_prefix']
+        filepath_prefix = cfg.dropbox['draft_dir_prefix'] if metas['draft'] else cfg.dropbox['post_dir_prefix']
 
         commit_data = {
             'branch': 'master',
@@ -150,11 +150,16 @@ excerpt:    "${excerpt}"
 
     def sync_to_dropbox(self, filename, draft, text):
         file_root = cfg.dropbox['directory_root']
-        dir_prefix = cfg.dropbox['drafts_dir_prefix'] if draft else cfg.dropbox['posts_dir_prefix']
+        dir_prefix = cfg.dropbox['draft_dir_prefix'] if draft else cfg.dropbox['post_dir_prefix']
         full_path = file_root + dir_prefix + filename
+        
         output = str.encode(text)
         try:
+            # upload post
             self._dbx.files_upload(output, full_path)
+            
+            # upload image
+            
         except AuthError as err:
             print(err)
 

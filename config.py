@@ -11,6 +11,6 @@ post = {
 
 dropbox = {
     'directory_root': '[JEKYLL ROOT DIR]',
-    'drafts_dir_prefix': '_drafts/',
-    'posts_dir_prefix': '_posts/'
+    'draft_dir_prefix': '_drafts/',
+    'post_dir_prefix': '_posts/'
 }

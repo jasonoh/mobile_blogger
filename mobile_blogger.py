@@ -5,6 +5,7 @@ import dialogs
 import gitlab
 import re
 import dropbox
+import paramiko
 import config as cfg
 
 from string import Template
@@ -52,10 +53,10 @@ def process_string_array(array):
 
 class MobileBlogger:
     def __init__(self, gitlab_url, gitlab_repo, gitlab_token, dbx_token):
-        self.gitlab_url = gitlab_url
-        self.gitlab_repo = gitlab_repo
+        self.gitlab_url   = gitlab_url
+        self.gitlab_repo  = gitlab_repo
         self.gitlab_token = gitlab_token
-        self.dbx_token = dbx_token
+        self.dbx_token    = dbx_token
         self._latest_commit = None
         self._initialize_clients()
 
@@ -132,10 +133,7 @@ excerpt:    "${excerpt}"
         text = self._prepend_metadata(text, default_metas)
         latest_commit = self._get_latest_commit()
 
-        print(text)
-        sys.exit(0)
-
-        filepath_prefix = cfg.dropbox['drafts_dir_prefix'] if metas['draft'] else cfg.dropbox['posts_dir_prefix']
+        filepath_prefix = cfg.dropbox['draft_dir_prefix'] if metas['draft'] else cfg.dropbox['post_dir_prefix']
 
         commit_data = {
             'branch': 'master',
@@ -148,18 +146,17 @@ excerpt:    "${excerpt}"
                 }
             ]
         }
-        commit = self.project.commits.create(commit_data)
+        self.project.commits.create(commit_data)
         return text
 
-    def sync_to_dropbox(self, filename, draft, text):
-        file_root = cfg.dropbox['directory_root']
-        dir_prefix = cfg.dropbox['drafts_dir_prefix'] if draft else cfg.dropbox['posts_dir_prefix']
-        full_path = file_root + dir_prefix + filename
-        output = str.encode(text)
-        try:
-            self._dbx.files_upload(output, full_path)
-        except AuthError as err:
-            print(err)
+    def git_sync_dropbox():
+        key = paramiko.RSAKey.from_private_key_file(cfg.ssh['keyfile'])
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=cfg.ssh['host'], port=cfg.ssh['port'] or 22, username=cfg.ssh['user'], pkey=key)
+        commands = [cfg.ssh['gitcommand']]
+        for command in commands:
+            stdin, stdout, stderr = client.exec_command(command)
 
 
 def main():
@@ -171,12 +168,12 @@ Generic test data!'''
         text = appex.get_text()
 
     if text:
-        author = cfg.post['post_author']
-        gitlab_url = cfg.post['gitlab_url']
-        gitlab_user = cfg.post['gitlab_user']
-        gitlab_repo = cfg.post['gitlab_repo']
-        gitlab_token = keychain.get_password('gitlab_token', gitlab_user) or ''
-        dbx_token = keychain.get_password('dbx_token', gitlab_user) or ''
+        author         = cfg.post['post_author']
+        gitlab_url     = cfg.post['gitlab_url']
+        gitlab_user    = cfg.post['gitlab_user']
+        gitlab_repo    = cfg.post['gitlab_repo']
+        gitlab_token   = keychain.get_password('gitlab_token', gitlab_user) or ''
+        dbx_token      = keychain.get_password('dbx_token', gitlab_user) or ''
 
         (title, text) = extract_title(text)
         filename = '%s-%s.md' % (date.today(), slug(title))
@@ -184,22 +181,17 @@ Generic test data!'''
         dbx_fields = (
             'Dropbox Settings',
             [
-                dict(title='Dropbox Token', key='dbx_token', type='text', value=dbx_token, autocorrection=False,
-                     autocapitalization=False)
+                dict(title='Dropbox Token', key='dbx_token', type='text', value=dbx_token, autocorrection=False, autocapitalization=False)
             ]
         )
 
         gitlab_fields = (
             'Gitlab Settings',
             [
-                dict(title='Gitlab URL', key='gitlab_url', type='text', value=gitlab_url, autocorrection=False,
-                     autocapitalization=False),
-                dict(title='Gitlab User', key='gitlab_user', type='text', value=gitlab_user, autocorrection=False,
-                     autocapitalization=False),
-                dict(title='Gitlab Token', key='gitlab_token', type='text', value=gitlab_token, autocorrection=False,
-                     autocapitalization=False),
-                dict(title='Repo', key='gitlab_repo', type='text', value=gitlab_repo, autocorrection=False,
-                     autocapitalization=False)
+                dict(title='Gitlab URL', key='gitlab_url', type='text', value=gitlab_url, autocorrection=False, autocapitalization=False),
+                dict(title='Gitlab User', key='gitlab_user', type='text', value=gitlab_user, autocorrection=False, autocapitalization=False),
+                dict(title='Gitlab Token', key='gitlab_token', type='text', value=gitlab_token, autocorrection=False, autocapitalization=False),
+                dict(title='Repo', key='gitlab_repo', type='text', value=gitlab_repo, autocorrection=False, autocapitalization=False)
             ]
         )
 
@@ -209,8 +201,7 @@ Generic test data!'''
                 dict(title='Title', key='title', type='text', value=title),
                 dict(title='Author', key='author', type='text', value=author),
                 dict(title='Draft', key='draft', type='switch', value=True),
-                dict(title='Layout', key='layout', type='text', value='post', autocorrection=False,
-                     autocapitalization=False),
+                dict(title='Layout', key='layout', type='text', value='post', autocorrection=False, autocapitalization=False),
                 dict(title='Tags', key='tags', type='text', value=''),
                 dict(title='Categories', key='categories', type='text', value=''),
                 dict(title='Comments', key='comments', type='switch', value=True),
@@ -218,8 +209,7 @@ Generic test data!'''
                 dict(title='ImagePath', key='feature_img_path', type='text', value=''),
                 dict(title='ImageWide', key='feature_img_wide', type='switch', value=False),
                 dict(title='ImageCaption', key='feature_img_caption', type='text', value=''),
-                dict(title='Filename', key='filename', type='text', value=filename, autocorrection=False,
-                     autocapitalization=False)
+                dict(title='Filename', key='filename', type='text', value=filename, autocorrection=False, autocapitalization=False)
             ],
             'Separate tags/categories with spaces'
         )
@@ -261,7 +251,7 @@ Generic test data!'''
         console.show_activity()
         mb = MobileBlogger(results['gitlab_url'], results['gitlab_repo'], results['gitlab_token'], results['dbx_token'])
         file = mb.create_new_post(results['title'], text, metas)
-        mb.sync_to_dropbox(results['filename'], results['draft'], file)
+        mb.git_sync_dropbox()
         console.hud_alert('new post created!')
     else:
         print('no input text found')

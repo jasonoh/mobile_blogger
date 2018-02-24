@@ -6,32 +6,40 @@
 * [Pythonista for iOS](http://omz-software.com/pythonista/)
 * [Gitlab](https://gitlab.com)
   * generate a (personal access token)[https://gitlab.com/profile/personal_access_tokens]
-  * obtain the project id for the associated repo
+  * obtain the project id for the associated repo by running the following command, replacing <YOUR PRIVATE TOKEN> with your Gitlab private token and <YOUR USERNAME> with your Gitlab username:
+    * `%> curl -XGET --header "PRIVATE-TOKEN: <YOUR PRIVATE TOKEN>" "https://gitlab.com/api/v4/users/<YOUR USERNAME>/projects" | python -mjson.tool`
+    * then find the "id" for the relevant project&mdash;you'll need this for the `post[gitlab_repo]` config in `config.py`
 * [Dropbox](https://dropbox.com)
-  * create a Dropbox app for this integration
+  * create a Dropbox (app)[https://www.dropbox.com/developers] for this integration
 
 ### Overview
-This is a [Pythonista](http://omz-software.com/pythonista/) script that integrates with the iOS share panel to allow you to:
-* use your favorite iOS markdown editor to create Jekyll posts
-* automatically create the YAML front-matter for these posts using the post's main header and text input
-* automatically commit these files to a [Gitlab](https://gitlab.com) repo (yes, Gitlab—I don't use the Jekyll integration with Github)
-* automatically sync these files to a designated location in Dropbox
+This is a [Pythonista](http://omz-software.com/pythonista/) script that integrates with the iOS share panel to allow you to use your favorite iOS markdown editor to create Jekyll posts and automate the following:
+* Creation the YAML front-matter for these posts using the post's main header and text input
+* Committing your post to your [Gitlab](https://gitlab.com) repo. Yes, the irony of using Gitlab as an integration point for a Github project isn't lost on me, however, there are 2 reasons for this:
+  * I don't use the built-in Jekyll integration with Github projects 
+  * I prefer to have my blog artifacts private and Github doesn't permit private repos for free accounts
+* Syncing files to a designated location in Dropbox
+* Resetting remote Dropbox repo to master
 
 The config file let's you specify Gitlab and Dropbox deets.
 
 This is largely based on the [work](http://codenugget.co/2015/11/18/mobile-blogging-with-pythonista-jekyll-and-github.html) from Pascal Cremer, but updated for Gitlab (vs Github) and with the added integration with Dropbox.
 
+### Assumptions
+* Your Jekyll folder is stored in Dropbox ("Content Source") and is the basis from which your Jekyll instance generates your static site
+* Content Source is a Git project and hosted in Gitlab
+* You have shell access to a server with the Dropbox CLI (client)[https://www.dropbox.com/install-linux] 
 
 ### Workflow
 * Write your blog post in Markdown (or Kramdown) in your favorite iOS editor (I use [Editorial](http://omz-software.com/editorial/index.html))
 * Click the Share option and run the Pythonista Share Extension Shortcut associated with this script
 * Enter the front-matter details in the UI form
-* Click Done; this will commit the post to your Gitlab repo and sync it to Dropbox
+* Click Done; this will commit the post to your Gitlab repo, sync it to Dropbox and update
 
-### Details
-My Jekyll instance resides on my own server, so I don't rely on the Github feature for hosting my blog. Git commits are
-so that I have versioning on my blog posts and don't serve as the mechanism for publishing. The key for my setup is the headless Dropbox instance on my server; once I sync the relevant file to the appropriate location in Dropbox, it automatically syncs to the server and the post goes live. As such, this assumes that you are using Dropbox as a store for your Jekyll installation and are detecting changes on your server for auto-publishing.
+### Notes
+This integration commits the post to Gitlab and copies the file to Dropbox (vs )
 
-Your setup may be entirely different and this application may not suit your needs at all.
+### See it Live
+My (website)[https://jasonoh.org] is built using Jekyll and posts are created using (Editorial)[http://omz-software.com/editorial/] and this integration. 
 
 Feel free to contribute comments/improvements!

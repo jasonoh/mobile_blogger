@@ -14,3 +14,11 @@ dropbox = {
     'drafts_dir_prefix': '_drafts/',
     'posts_dir_prefix': '_posts/'
 }
+
+ssh = {
+    'keyfile': '[/path/to/id_rsa]',
+    'host': '[hostname]',
+    'port': '[ssh port]',
+    'user': '[ssh username]',
+    'gitcommand': '[/remote/path/to/reset/script.sh]'
+}

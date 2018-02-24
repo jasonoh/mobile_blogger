@@ -11,7 +11,6 @@ import config as cfg
 from string import Template
 from datetime import date
 from time import strftime
-from dropbox.exceptions import AuthError
 
 
 def slug(text):

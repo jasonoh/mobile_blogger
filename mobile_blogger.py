@@ -34,7 +34,7 @@ def extract_title(text):
         return title, None
 
     index = 1
-    if re.search('^(=|-)+$', lines[1]):
+    if re.search('^([=\\-])+$', lines[1]):
         index = 2
 
     return title, '\n'.join(lines[index:])
@@ -63,7 +63,7 @@ class MobileBlogger:
         self._gl = gitlab.Gitlab(
             self.gitlab_url,
             self.gitlab_token,
-            api_version=4
+            api_version='4'
         )
         self._gl.auth()
         self._dbx = dropbox.Dropbox(self.dbx_token)
@@ -124,13 +124,13 @@ excerpt:    "${excerpt}"
         }
 
         default_metas.update(metas)
-        branch = default_metas['branch']
+        # branch = default_metas['branch']
         filename = default_metas['filename']
         del default_metas['branch']
         del default_metas['filename']
 
         text = self._prepend_metadata(text, default_metas)
-        latest_commit = self._get_latest_commit()
+        # latest_commit = self._get_latest_commit()
 
         filepath_prefix = cfg.dropbox['draft_dir_prefix'] if metas['draft'] else cfg.dropbox['post_dir_prefix']
 
@@ -148,6 +148,7 @@ excerpt:    "${excerpt}"
         self.project.commits.create(commit_data)
         return text
 
+    @staticmethod
     def git_sync_dropbox():
         key = paramiko.RSAKey.from_private_key_file(cfg.ssh['keyfile'])
         client = paramiko.SSHClient()
@@ -155,7 +156,7 @@ excerpt:    "${excerpt}"
         client.connect(hostname=cfg.ssh['host'], port=cfg.ssh['port'] or 22, username=cfg.ssh['user'], pkey=key)
         commands = [cfg.ssh['gitcommand']]
         for command in commands:
-            stdin, stdout, stderr = client.exec_command(command)
+            client.exec_command(command)
 
 
 def main():
@@ -249,7 +250,7 @@ Generic test data!'''
 
         console.show_activity()
         mb = MobileBlogger(results['gitlab_url'], results['gitlab_repo'], results['gitlab_token'], results['dbx_token'])
-        file = mb.create_new_post(results['title'], text, metas)
+        mb.create_new_post(results['title'], text, metas)
         mb.git_sync_dropbox()
         console.hud_alert('new post created!')
     else:
